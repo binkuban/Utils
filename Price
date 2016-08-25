@@ -1,0 +1,65 @@
+import android.app.Activity;
+import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+    private TextView priceText;
+    private TextView priceText1;
+    private TextView priceText2;
+    private TextView priceText3;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        initView();
+    }
+
+    private void initView() {
+        priceText = (TextView) findViewById(R.id.price);
+        priceText1 = (TextView) findViewById(R.id.priceText1);
+        priceText2 = (TextView) findViewById(R.id.priceText2);
+        priceText3 = (TextView) findViewById(R.id.priceText3);
+        priceText.setText(getPrice("", 50416, true));
+        priceText1.setText(getPrice(50416, true));
+        priceText2.setText(getPrice(50400, 26, 18, true));
+        priceText3.setText(getPrice("$ ", 50400, 26, 18, true));
+    }
+
+    public SpannableStringBuilder getPrice(int price, boolean showDecimal) {
+        return getPrice("", price, 18, 12, showDecimal);
+    }
+
+    public SpannableStringBuilder getPrice(int price, int big, int small, boolean showDecimal) {
+        return getPrice("", price, big, small, showDecimal);
+    }
+
+    public SpannableStringBuilder getPrice(String symbol, int price, boolean showDecimal) {
+        return getPrice(symbol, price, 18, 12, showDecimal);
+    }
+
+    public SpannableStringBuilder getPrice(String symbol, int price, int big, int small, boolean showDecimal) {
+        String priceStr;
+        if ("".equals(symbol)) {
+            symbol = "￥";
+        }
+        int integer = price / 100;
+        int decimal = price % 100;
+        int intLength = String.valueOf(integer).length();
+        if (showDecimal) {
+            priceStr = symbol + integer + "." + String.format("%02d", decimal);
+        } else {
+            priceStr = symbol + integer;
+        }
+        SpannableStringBuilder spannable = new SpannableStringBuilder(priceStr);
+        spannable.setSpan(new AbsoluteSizeSpan(small, true), 0, symbol.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new AbsoluteSizeSpan(big, true), symbol.length(), intLength + symbol.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (showDecimal) {
+            spannable.setSpan(new AbsoluteSizeSpan(small, true), intLength + symbol.length(), priceStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return spannable;
+    }
+}
